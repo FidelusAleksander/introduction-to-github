@@ -8,7 +8,6 @@ name: Step 1 # Create a branch
 on:
   push:
     branches:
-      - "!main"
       - "my-first-branch"
 
 permissions:
@@ -21,21 +20,14 @@ jobs:
     name: Find Exercise Issue
     uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@dev
 
-
-
   check_step_work:
     name: Check step work
     runs-on: ubuntu-latest
     needs: find_exercise
-    if: |
-      !github.event.repository.is_template
     env:
       ISSUE_URL: ${{ needs.find_exercise.outputs.issue-url }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Get response templates
         uses: actions/checkout@v4
         with:
@@ -61,10 +53,11 @@ jobs:
       - name: Update comment - step finished
         run: |
           gh issue comment "$ISSUE_URL" \
-            --body "${{ steps.build-message-step-finish.outputs.updated-text }}" \
+            --body "$ISSUE_BODY" \
             --edit-last
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_BODY: ${{ steps.build-message-step-finish.outputs.updated-text }}
 
   post_next_step_content:
     name: Post next step content
@@ -74,9 +67,6 @@ jobs:
       ISSUE_URL: ${{ needs.find_exercise.outputs.issue-url }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Get response templates
         uses: actions/checkout@v4
         with:
