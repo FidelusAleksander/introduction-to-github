@@ -17,33 +17,20 @@ permissions:
   issues: write
 
 jobs:
-  find_lesson:
-    name: Find lesson by issue title
-    runs-on: ubuntu-latest
-    if: |
-      !github.event.repository.is_template
-
-    outputs:
-      issue-url: ${{ steps.get-issue-url-by-title.outputs.ISSUE_URL }}
-
-    steps:
-      - id: get-issue-url-by-title
-        run: |
-          issue_url=$(gh issue list --repo ${{ github.repository }} --search "in:title Course:" --json url,title --jq '.[].url')
-          echo "ISSUE_URL=$issue_url" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  find_exercise:
+    name: Find Exercise Issue
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@dev
 
   check_step_work:
     name: Check step work
-    needs: find_lesson
+    needs: find_exercise
     runs-on: ubuntu-latest
     if: |
       !github.event.repository.is_template &&
       github.head_ref == 'my-first-branch' &&
       github.event.pull_request.merged == true
     env:
-      ISSUE_URL: ${{ needs.find_lesson.outputs.issue-url }}
+      ISSUE_URL: ${{ needs.find_exercise.outputs.issue-url }}
 
     steps:
       - name: Get response templates
@@ -65,12 +52,12 @@ jobs:
 
   post_review_content:
     name: Post review content
-    needs: [find_lesson, check_step_work]
+    needs: [find_exercise, check_step_work]
     runs-on: ubuntu-latest
     if: |
       !github.event.repository.is_template
     env:
-      ISSUE_URL: ${{ needs.find_lesson.outputs.issue-url }}
+      ISSUE_URL: ${{ needs.find_exercise.outputs.issue-url }}
 
     steps:
       - name: Checkout
@@ -85,10 +72,10 @@ jobs:
 
   finish_course:
     name: Finish course
-    needs: [find_lesson, post_review_content]
+    needs: [find_exercise, post_review_content]
     runs-on: ubuntu-latest
     env:
-      ISSUE_URL: ${{ needs.find_lesson.outputs.issue-url }}
+      ISSUE_URL: ${{ needs.find_exercise.outputs.issue-url }}
 
     steps:
       - name: Checkout
