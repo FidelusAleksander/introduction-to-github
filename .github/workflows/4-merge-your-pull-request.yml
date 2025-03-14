@@ -70,74 +70,22 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  finish_course:
-    name: Finish course
+  finish_exercise:
+    name: Finish Exercise
     needs: [find_exercise, post_review_content]
-    runs-on: ubuntu-latest
-    env:
-      ISSUE_URL: ${{ needs.find_exercise.outputs.issue-url }}
+    uses: skills/exercise-toolkit/.github/workflows/finish-exercise.yml@finish-exercise
+    with:
+      issue-url: ${{ needs.find_exercise.outputs.issue-url }}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: main
 
-      - name: Get response templates
-        uses: actions/checkout@v4
-        with:
-          repository: skills/response-templates
-          path: skills-response-templates
+  disable_workflow:
+      name: Disable this workflow
+      needs: [find_exercise, post_review_content]
+      runs-on: ubuntu-latest
 
-      - name: Configure Git user
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email github-actions[bot]@users.noreply.github.com
+      steps:
+        - name: Disable current workflow
+          run: gh workflow disable "${{github.workflow}}"
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build message - congratulations
-        id: build-message-congratulations
-        uses: skills/action-text-variables@v1
-        with:
-          template-file: skills-response-templates/readme/congratulations.md
-          template-vars: |
-            login=${{ github.actor }}
-
-      - name: Update README - congratulations
-        run: |
-          # Add "Congratulations" to the start of the README
-          orig_readme=$(cat README.md)
-          new_readme="${{ steps.build-message-congratulations.outputs.updated-text }} $orig_readme"
-
-          # Update file and push
-          echo "$new_readme" > README.md
-          git add README.md
-          git commit --message="Congratulations!🎉"
-          git push
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build message - lesson finished
-        id: build-finish-message
-        uses: skills/action-text-variables@v1
-        with:
-          template-file: skills-response-templates/step-feedback/lesson-finished.md
-          template-vars: |
-            login=${{ github.actor }}
-            repo_full_name=${{ github.repository }}
-
-      - name: Create comment - lesson finished
-        run: |
-          gh issue comment "$ISSUE_URL" \
-            --body "${{ steps.build-finish-message.outputs.updated-text }}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Close issue
-        run: gh issue close "$ISSUE_URL"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Disable current workflow
-        run: gh workflow disable "${{github.workflow}}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
