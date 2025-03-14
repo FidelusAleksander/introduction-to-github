@@ -28,12 +28,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [start_exercise]
     env:
-      ISSUE_URL: ${{ needs.create_exercise.outputs.issue-url }}
+      ISSUE_URL: ${{ needs.start_exercise.outputs.issue-url }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Get response templates
         uses: actions/checkout@v4
         with:
