@@ -1,10 +1,10 @@
 # Introduction to GitHub
 
-<!-- ![](../../actions/workflows/0-start-course.yml/badge.svg?branch=main) -->
-![](../../actions/workflows/1-create-a-branch.yml/badge.svg?branch=my-first-branch)
-![](../../actions/workflows/2-commit-a-file.yml/badge.svg?branch=my-first-branch)
-![](../../actions/workflows/3-open-a-pull-request.yml/badge.svg?branch=my-first-branch)
-![](../../actions/workflows/4-merge-your-pull-request.yml/badge.svg?branch=my-first-branch)
+<!-- ![](../../actions/workflows/0-start-exercise.yml/badge.svg) -->
+![](../../actions/workflows/1-create-a-branch.yml/badge.svg)
+![](../../actions/workflows/2-commit-a-file.yml/badge.svg)
+![](../../actions/workflows/3-open-a-pull-request.yml/badge.svg)
+![](../../actions/workflows/4-merge-your-pull-request.yml/badge.svg)
 
 _Get started using GitHub in less than an hour._
 
