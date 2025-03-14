@@ -82,13 +82,15 @@ jobs:
 
 
   disable_workflow:
-      name: Disable this workflow
-      needs: [find_exercise, post_review_content]
-      runs-on: ubuntu-latest
+    name: Disable this workflow
+    needs: [find_exercise, post_review_content]
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: Disable current workflow
-          run: gh workflow disable "${{github.workflow}}"
-          env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Disable current workflow
+        run: gh workflow disable "${{github.workflow}}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
